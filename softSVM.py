@@ -85,50 +85,27 @@ def testClassifier(Xs,Ts,Ls,b,K,verbose=True):
             misclassification += 1
     return misclassification   
 
-def project(d,b,Ls,Ts,K,a1,svx,svy):
+def project(d,Xs,Ts,Ls,b):
     y_predict = np.zeros(len(d))
-    for l in range(len(d)):
+    for i in range(len(d)):
         s = 0
-        for i,j,k in zip(a1,svy,svx):
-            print "here is d"
-            print d[l]
-            print "here is svx"
-            print svx
-            s += i * j * K(d[l],svx)
-        y_predict[l] = s
+        for j in range(len(Ts)):
+            if Ls[j] >= 1e-10:
+                s += Ls[j] * Ts[j] * K(Xs[j],d[i])
+        y_predict[i] = s
     return y_predict + b
 
-def plotBoundaries(b,Ls,Ts,K,a1,svx,svy):
-    X1, X2 = np.meshgrid(np.linspace(-8,8,20), np.linspace(-6,6,20))
+def plotBoundaries(Xs,Ts,Ls,b):
+    X1, X2 = np.meshgrid(np.linspace(-8,8,50), np.linspace(-6,6,50))
     X = np.array([[x1, x2] for x1,x2 in zip(np.ravel(X1),np.ravel(X2))])
-    #d = X[:,[0,1]]
-    Z = project(X,b,Ls,Ts,K,a1,svx,svy).reshape(X1.shape)
-    plt.contour(X1, X2, Z, [0.0], colors='green', linewidths=1, origin='lower')
-    plt.contour(X1, X2, Z + 1, [0.0], colors='red', linewidths=1, origin='lower')
-    plt.contour(X1, X2, Z - 1, [0.0], colors='blue', linewidths=1, origin='lower')
+    d = X[:,[0,1]]
+    Z = project(d,Xs,Ts,Ls,b).reshape(X1.shape)
+    plt.contour(X1, X2, Z, [0.0], colors='green', linewidths=2, origin='lower')
+    plt.contour(X1, X2, Z + 1, [0.0], colors='red', linewidths=2, origin='lower')
+    plt.contour(X1, X2, Z - 1, [0.0], colors='blue', linewidths=2, origin='lower')
     
     plt.axis("tight")
     plt.show()
-    
-def plotSV(Ls,Ts,b,K):
-    X1, X2 = np.meshgrid(np.linspace(-8,8,50), np.linspace(-6,6,50))
-    X = np.array([[x1, x2] for x1,x2 in zip(np.ravel(X1),np.ravel(X2))])
-    #d = X[:,[0,1]]
-    d = np.array([[2.045, 0.258]])
-    print d
-    #print d
-    #print len(d)
-    for i in range(len(d)):
-        s = b
-        for j in range(len(Ts)):
-            if Ls[j] >= 1e-10:
-                s += Ls[j] * Ts[j] * K(d[j],d[i])
-        if s >= 0.0:
-            plt.plot(d[i,0],d[i,1],'go')
-        if s <= 0.0:
-            plt.plot(d[i,0],d[i,1],'yo')
-        
-    
 
 data = np.loadtxt("training-dataset.txt")
 #data = np.loadtxt("train1.txt")
@@ -143,7 +120,7 @@ C = 1
 stat, Ls, a = makeLambdas(x,y,C,K)
 b = makeB(x,y,C,Ls,K,stat)
 #miss = testClassifier(x,y,Ls,b,K)
-print "There were %d misclassications!" %miss
+#print "There were %d misclassications!" %miss
 print "--------------------------------------------------------"
 print stat
 print b
@@ -152,5 +129,6 @@ sv = a > 1e-5
 a1 = a[sv]
 svx = x[sv]
 svy = y[sv]
-plotBoundaries(b,Ls,y,K,a1,svx,svy)
+#plotSV(Ls,x,y,b,K)
+plotBoundaries(x,y,Ls,b)
 #pca, predicate logic, logic under uncertainty
