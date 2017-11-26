@@ -280,7 +280,7 @@ def plotData(x,y,test=False):
     plt.plot(x[neg,0],x[neg,1],negPoint)
 ##--------------------------------------------------------------------------
  
-data = np.loadtxt("training-dataset.txt")   ## Read the training data set
+data = np.loadtxt("training-dataset-aut-2017.txt")   ## Read the training data set
 
 ## Split the training data in feature(x) and desired output(y)
 Xs = data[:,[0,1]]
@@ -315,10 +315,10 @@ b = makeB(Xs,Ts,C,Ls,K,stat)        ## Find the bias, no explicit w vector neede
 ## It is not relevant testing our classifier on the training data, but we 
 ## should test it against previously unseen data sets
 miss = testClassifier(Xs,Xs,Ts,Ts,Ls,b,K,False)
-print "There were %d misclassications when using the training data as testing set!" %miss
+print "There were %d misclassications when using the training data as testing set with C=%d!" %(miss,C)
 print "--------------------------------------------------------"
 
-dataTest = np.loadtxt("testing-dataset.txt")    # Read testing data
+dataTest = np.loadtxt("testing-dataset-aut-2017.txt")    # Read testing data
 
 ## Split the testing data in feature(x) and desired output(y)
 Xtest = dataTest[:,[0,1]]
@@ -344,7 +344,7 @@ plotData(Xtest,Ttest,True)      ## Plot the testing data
 ## it does have some misclassifications in the training data, but performs
 ## better on previously unseen data points.
 miss = testClassifier(Xs,Xtest,Ts,Ttest,Ls,b,K,False)
-print "There were %d misclassications when using the testing data as testing set!" %miss
+print "There were %d misclassications when using the testing data as testing set with C=%d!" %(miss,C)
 print "--------------------------------------------------------"
 
 ## plot the decision boundary and the +1 and -1 margins
